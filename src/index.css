@@ -1,65 +1,523 @@
-.container {
-  display: flex;
+/* Mapa */
+.map-container {
+  position: relative;
+  width: 100%;
   height: 100vh;
 }
 
-.map-container {
-  width: 70%;
+#map {
+  width: 100%;
   height: 100%;
 }
 
-.dashboard {
-  width: 30%;
-  padding: 20px;
-  background: #1e1e1e;
-  color: white;
-  overflow-y: auto;
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* Botón de importar GeoJSON */
+.import-button {
+  position: relative;
+  z-index: 2; /* Asegura que esté por encima si es necesario */
 }
 
-.dashboard-content {
-  background: #2a2a2a;
-  padding: 15px;
+/* Estilos del botón */
+.button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 18px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-  width: 90%;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s ease-in-out;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+/* Efecto hover para el botón */
+.button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Efecto cuando está deshabilitado */
+.button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hidden-input {
+  display: none;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  position: absolute;
+  overflow: hidden;
+}
+
+/* Importar la fuente desde Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap");
+
+/* Dashboard */
+.dashboard {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.15); /* Efecto Glass */
+  padding: 18px 25px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 1000;
+  transition: all 0.3s ease-in-out;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Animación al pasar el mouse */
+.dashboard:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  transform: scale(1.03);
+}
+
+/* Estilos del título */
+.dashboard h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
   text-align: center;
 }
 
-h2 {
-  color: #ffcc00;
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+/* Contenido del dashboard */
+.dashboard-content {
+  font-size: 15px;
+  color: #f0f0f0;
+  text-align: center;
+  line-height: 1.5;
 }
 
-p {
-  font-size: 1rem;
-  margin: 5px 0;
+/* Ajustar todos los textos para mayor claridad */
+.dashboard * {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .placeholder-text {
-  font-size: 1.2rem;
-  font-weight: bold;
   color: #888;
+  font-style: italic;
 }
 
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
+/* Aplicar la fuente "Poppins" al botón */
+.button {
+  font-family: "Poppins", sans-serif;
+}
 
-  .map-container {
-    width: 100%;
-    height: 60vh;
-  }
+.search-container {
+  position: absolute;
+  top: 280px; /* Ajusta este valor para que quede debajo del dashboard */
+  left: 10px; /* Alineado con el dashboard */
+  transform: none; /* Quita la transformación anterior */
+  width: 240px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
 
-  .dashboard {
-    width: 100%;
-    height: 40vh;
-    padding: 15px;
+.search-input {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+  background: #f3f3f3;
+  transition: all 0.3s ease-in-out;
+}
+
+.search-input:focus {
+  background: #fff;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.4);
+}
+
+.dropdown {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+  max-height: 150px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  top: 42px;
+  left: 0;
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.dropdown li {
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 13px;
+  font-weight: 400;
+  color: #333;
+}
+
+.dropdown li:hover {
+  background: #007bff;
+  color: white;
+  transform: scale(1.01);
+}
+
+/* Animación para la lista desplegable */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.map-buttons {
+  display: flex;
+  flex-direction: column; /* Asegura que los botones se apilen verticalmente */
+  gap: 12px; /* Espacio entre botones */
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  align-items: flex-start; /* Asegura que estén alineados a la izquierda */
+}
+
+.button {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+  border: none;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #0069d9;
+}
+
+.button.disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.classify-button-container {
+  position: relative;
+  width: max-content; /* Ajusta el ancho al contenido */
+}
+
+.field-selector {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 10px;
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.field-selector h3 {
+  margin-top: 0;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.field-selector ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.field-selector li {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.field-selector li:hover {
+  background-color: #f0f0f0;
+}
+
+.selected-field-info {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10;
+}
+
+/* Estilos para el popup y elementos relacionados */
+.feature-popup {
+  max-width: 300px !important;
+}
+
+.popup-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  padding: 5px;
+}
+
+.popup-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.popup-field,
+.popup-value,
+.popup-property {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.color-indicator {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  margin-right: 5px;
+  vertical-align: middle;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.popup-properties {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Estilos para la leyenda */
+.map-legend {
+  position: absolute;
+  top: 160px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  max-width: 200px;
+  max-height: 50vh;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+.map-legend h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.legend-color {
+  display: block;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  margin-right: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.legend-value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+//* Contenedor del control deslizante */
+.opacity-slider-container {
+  position: relative;
+  width: max-content;
+  margin-top: 10px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Etiqueta del control deslizante */
+.opacity-slider-container label {
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 8px;
+  display: block;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos del control deslizante */
+.opacity-slider {
+  width: 220px;
+  appearance: none;
+  background: linear-gradient(to right, #ddd, #aaa);
+  height: 6px;
+  border-radius: 10px;
+  outline: none;
+  opacity: 0.8;
+  transition: all 0.3s ease-in-out;
+  box-shadow: inset 0px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover del slider */
+.opacity-slider:hover {
+  opacity: 1;
+  background: linear-gradient(to right, #ccc, #888);
+}
+
+/* Estilo del "thumb" en WebKit (Chrome, Safari) */
+.opacity-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle, #007bff, #0056b3);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Efecto al presionar el thumb en WebKit */
+.opacity-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+/* Estilo del "thumb" en Firefox */
+.opacity-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle, #007bff, #0056b3);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Efecto al presionar el thumb en Firefox */
+.opacity-slider::-moz-range-thumb:active {
+  transform: scale(1.2);
+}
+
+/* Botón adicional estilizado */
+.opacity-slider-container .button {
+  margin-top: 12px;
+  padding: 8px 15px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.opacity-slider-container .button:hover {
+  background: linear-gradient(to right, #0056b3, #003f7f);
+  transform: scale(1.05);
+}
+
+/* Contenedor del input de coordenadas */
+.coordinate-input-overlay {
+  position: absolute;
+  bottom: 40px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Título del input de coordenadas */
+.coordinate-input-overlay h3 {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+/* Estilos de los campos de entrada */
+.coordinate-input-overlay label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.coordinate-input-overlay input[type="number"] {
+  width: 50px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.coordinate-input-overlay input[type="number"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Botón para ir a las coordenadas */
+.coordinate-input-overlay button {
+  margin-top: 4px;
+  padding: 5px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.coordinate-input-overlay button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
 }
